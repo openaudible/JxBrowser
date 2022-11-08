@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>JxBrowser</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
+        <jxbrowser.version>7.28.1</jxbrowser.version>
+        <swt_version>3.121.0</swt_version>
+        <main.class>JxBrowserTest</main.class>
+
+
+    </properties>
+
+
+    <profiles>
+
+        <profile>
+            <id>Win64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <swt_artifactId>org.eclipse.swt.win32.win32.x86_64</swt_artifactId>
+                <app_jar>win_x86_64</app_jar>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>Mac_x86_64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt_artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt_artifactId>
+                <app_jar>mac_x86_64</app_jar>
+            </properties>
+
+        </profile>
+        <profile>
+            <id>Mac_aarch64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt_artifactId>org.eclipse.swt.cocoa.macosx.aarch64</swt_artifactId>
+                <app_jar>mac_aarch64</app_jar>
+            </properties>
+
+        </profile>
+        <profile>
+            <id>Linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>Linux</name>
+                </os>
+
+            </activation>
+            <properties>
+                <swt_artifactId>org.eclipse.swt.gtk.linux.x86_64</swt_artifactId>
+                <app_jar>gtk_x86_64</app_jar>
+                <jcef-natives>jcef-natives-linux-arm64</jcef-natives>
+                <jcef-natives-version>jcef-a51ff7f+cef-95.7.14+g9f72f35+chromium-95.0.4638.69</jcef-natives-version>
+            </properties>
+        </profile>
+
+    </profiles>
+
+
+    <repositories>
+        <repository>
+            <id>com.teamdev</id>
+            <url>https://europe-maven.pkg.dev/jxbrowser/releases</url>
+        </repository>
+        <repository>
+            <id>maven-eclipse-repo</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-cross-platform</artifactId>
+            <version>${jxbrowser.version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-swt</artifactId>
+            <version>${jxbrowser.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>${swt_artifactId}</artifactId>
+            <version>${swt_version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>me.friwi</groupId>
+            <artifactId>jcefmaven</artifactId>
+            <version>105.3.36.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <directory>target</directory>
+        <outputDirectory>target/classes</outputDirectory>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+
+        <plugins>
+
+
+<!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>&#45;&#45;add-modules</arg>
+                        <arg>java.desktop</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+-->
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <appendAssemblyId>true</appendAssemblyId>
+
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifestEntries>
+                            <Main-Class>${main.class}</Main-Class>
+                            <Application-Name>JXBrowserSWT</Application-Name>
+                            <Build-Date>${maven.build.timestamp}</Build-Date>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>true</appendAssemblyId>
+                            <finalName>${app_jar}</finalName>
+                            <attach>true</attach>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
